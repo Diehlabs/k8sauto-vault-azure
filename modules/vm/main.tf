@@ -46,7 +46,7 @@ resource "azurerm_linux_virtual_machine" "vm" {
 }
 
 resource "azurerm_public_ip" "vm" {
-  name                = "jump-box-pip"
+  name                = "${var.vm_name}-pubip"
   location            = var.tags.region
   resource_group_name = var.rg_name
   allocation_method   = "Static"
