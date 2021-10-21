@@ -58,6 +58,7 @@ resource "azurerm_public_ip" "vault_lb" {
   location            = local.tags.region
   resource_group_name = azurerm_resource_group.vault.name
   allocation_method   = "Static"
+  sku                 = "Standard"
   tags                = local.tags
 }
 
