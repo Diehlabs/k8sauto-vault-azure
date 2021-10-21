@@ -32,31 +32,32 @@ resource "azurerm_resource_group" "vault" {
   tags     = local.tags
 }
 
-# resource "azurerm_network_security_group" "vault_vm_nsg" {
-#   name                = "vaul-vm-ssh-access"
-#   location            = local.tags.region
-#   resource_group_name = azurerm_resource_group.vault.name
+resource "azurerm_network_security_group" "vault_vm_nsg" {
+  name                = "vaul-vm-ssh-access"
+  location            = local.tags.region
+  resource_group_name = azurerm_resource_group.vault.name
 
-# dynamic...
-#   security_rule {
-#     name                       = "SSH"
-#     priority                   = 1001
-#     direction                  = "Inbound"
-#     access                     = "Allow"
-#     protocol                   = "Tcp"
-#     source_port_range          = "*"
-#     destination_port_range     = "22"
-#     source_address_prefix      = "*"
-#     destination_address_prefix = "*"
-#   }
-#   tags = local.tags
-# }
+  security_rule {
+    name                       = "SSH"
+    priority                   = 1001
+    direction                  = "Inbound"
+    access                     = "Allow"
+    protocol                   = "Tcp"
+    source_port_range          = "*"
+    destination_port_range     = "22"
+    source_address_prefix      = "*"
+    destination_address_prefix = "*"
+  }
+  tags = local.tags
+}
 
-# resource "azurerm_network_interface_security_group_association" "vm_ssh" {
-#   for_each = module.vault_vms.vms
-#   network_interface_id      = each.value.nic_id
-#   network_security_group_id = azurerm_network_security_group.vault_vm_nsh.id
-# }
+resource "azurerm_network_interface_security_group_association" "vm_ssh" {
+  for_each = { for vm in module.vault_vms :
+    vm.vm_name => vm.nic_id
+  }
+  network_interface_id      = each.value
+  network_security_group_id = azurerm_network_security_group.vault_vm_nsg.id
+}
 
 resource "azurerm_public_ip" "vault_lb" {
   name                = "PublicIPForLB"

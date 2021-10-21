@@ -5,6 +5,7 @@ all:
 %{ for host, ipaddr in hosts }
     '${ipaddr}':
       node_id: ${host}
+      # private_ip:
 %{ endfor ~}
   vars:
     ansible_become: yes
