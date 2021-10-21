@@ -2,11 +2,10 @@
 # Terraform will generate this file on every run
 all:
   hosts:
-    %{ for host, ipaddr in hosts }
+%{ for host, ipaddr in hosts }
     '${ipaddr}':
-  host_ip:
-    node_id: ${host}
-    %{ endfor ~}
+      node_id: ${host}
+%{ endfor ~}
   vars:
     ansible_become: yes
     ansible_connection: ssh
