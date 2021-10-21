@@ -139,5 +139,5 @@ module "vault_vms" {
   rg_name        = azurerm_resource_group.vault.name
   subnet_id      = azurerm_subnet.vault.id
   vm_name        = each.key
-  ssh_public_key = data.terraform_remote_state.core.outputs.ssh_key.public_key_pem
+  ssh_public_key = data.terraform_remote_state.core.outputs.ssh_key.public_key_openssh
 }
