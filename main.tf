@@ -3,7 +3,12 @@ provider "azurerm" {
 }
 
 locals {
-  tags = data.terraform_remote_state.core.outputs.tags
+  tags = {
+    product      = "vault"
+    tech_contact = "diehl"
+    owner        = "tgo"
+    region       = "westus"
+  }
 }
 
 data "terraform_remote_state" "core" {
@@ -92,8 +97,33 @@ resource "azurerm_lb_probe" "lb_web_probe" {
 }
 
 resource "azurerm_lb_backend_address_pool" "vault_lb_pool" {
-  loadbalancer_id     = azurerm_lb.vault_lb.id
-  name                = "vault-lb-pool"
+  loadbalancer_id = azurerm_lb.vault_lb.id
+  name            = "vault-lb-pool"
+}
+
+resource "azurerm_virtual_network" "vault" {
+  name                = "vault-vnet"
+  address_space       = ["192.168.50.0/24"]
+  location            = azurerm_resource_group.vault.location
+  resource_group_name = azurerm_resource_group.vault.name
+}
+
+resource "azurerm_subnet" "vault" {
+  name                 = "vault-cluster"
+  resource_group_name  = azurerm_resource_group.vault.name
+  virtual_network_name = azurerm_virtual_network.vault.name
+  address_prefixes     = ["192.168.50.0/24"]
+  service_endpoints    = ["Microsoft.Storage"]
+}
+
+resource "azurerm_storage_account" "vault" {
+  name                     = "vaultcluster"
+  resource_group_name      = azurerm_resource_group.vault.name
+  location                 = azurerm_resource_group.vault.location
+  account_tier             = "Standard"
+  account_replication_type = "GRS"
+
+  tags = local.tags
 }
 
 # module "vault_vms" {
