@@ -141,7 +141,7 @@ resource "azurerm_storage_container" "vault" {
 module "vault_vms" {
   source         = "./modules/vm"
   for_each       = local.vms
-  tags           = local.tags
+  tags           = merge(local.tags, { consul_auto_join = "clam" })
   rg_name        = azurerm_resource_group.vault.name
   subnet_id      = azurerm_subnet.vault.id
   vm_name        = each.key
