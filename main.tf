@@ -7,7 +7,7 @@ locals {
     product      = "vault"
     tech_contact = "diehl"
     owner        = "tgo"
-    region       = "westus"
+    region       = "centralus"
   }
 }
 
