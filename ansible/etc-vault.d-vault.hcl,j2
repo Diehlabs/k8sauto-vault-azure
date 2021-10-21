@@ -1,5 +1,5 @@
-cluster_addr  = "https://<LOCAL_IPV4_ADDRESS>:8201"
-api_addr      = "https://<LOCAL_IPV4_ADDRESS>:8200"
+cluster_addr  = "https://{{ node_ip }}:8201"
+api_addr      = "https://{{ node_ip }}:8200"
 disable_mlock = true
 
 listener "tcp" {
@@ -11,7 +11,7 @@ listener "tcp" {
 
 storage "raft" {
   path    = "/opt/vault/data"
-  node_id = "<UNIQUE_ID_FOR_THIS_HOST>"
+  node_id = "{{ node_id }}"
 
   retry_join {
     auto_join               = "provider=azure subscription_id=<SUBSCRIPTION_ID> resource_group=<RESOURCE_GROUP_NAME> vm_scale_set=<VM_SCALE_SET_NAME>"
@@ -24,9 +24,9 @@ storage "raft" {
 }
 
 storage "azure" {
-  accountName = "my-storage-account"
-  accountKey  = "abcd1234"
-  container   = "container-efgh5678"
+  accountName = "{{ azure_storage_account_name }}"
+  accountKey  = "{{ azure_storage_accoun_key }}"
+  container   = "{{ azure_storage_container }}"
   environment = "AzurePublicCloud"
 }
 

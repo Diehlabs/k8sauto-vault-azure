@@ -132,6 +132,12 @@ resource "azurerm_storage_account" "vault" {
   tags = local.tags
 }
 
+resource "azurerm_storage_container" "vault" {
+  name                  = "vhds"
+  storage_account_name  = azurerm_storage_account.vault.name
+  container_access_type = "private"
+}
+
 module "vault_vms" {
   source         = "./modules/vm"
   for_each       = local.vms
