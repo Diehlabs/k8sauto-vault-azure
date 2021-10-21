@@ -117,7 +117,7 @@ resource "azurerm_subnet" "vault" {
 }
 
 resource "azurerm_storage_account" "vault" {
-  name                     = "vaultcluster"
+  name                     = "vaultcluster1"
   resource_group_name      = azurerm_resource_group.vault.name
   location                 = azurerm_resource_group.vault.location
   account_tier             = "Standard"
