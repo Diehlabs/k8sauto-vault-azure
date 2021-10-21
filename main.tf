@@ -9,6 +9,11 @@ locals {
     owner        = "tgo"
     region       = "centralus"
   }
+  vms = {
+    vault01 = "vault01"
+    vault02 = "vault02"
+    vault03 = "vault03"
+  }
 }
 
 data "terraform_remote_state" "core" {
@@ -127,6 +132,12 @@ resource "azurerm_storage_account" "vault" {
   tags = local.tags
 }
 
-# module "vault_vms" {
-#   source = "./modules/vm"
-# }
+module "vault_vms" {
+  source         = "./modules/vm"
+  for_each       = local.vms
+  tags           = local.tags
+  rg_name        = azurerm_resource_group.vault.name
+  subnet_id      = azurerm_subnet.vault.id
+  vm_name        = each.key
+  ssh_public_key = data.terraform_remote_state.core.outputs.ssh_key.public_key_pem
+}

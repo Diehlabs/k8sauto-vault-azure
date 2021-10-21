@@ -1,21 +1,21 @@
 resource "azurerm_network_interface" "vm" {
-  name                = "internal"
-  location            = azurerm_resource_group.aks_jump.location
-  resource_group_name = azurerm_resource_group.aks_jump.name
+  name                = "${var.vm_name}-nic"
+  location            = var.tags.region
+  resource_group_name = var.rg_name
 
   ip_configuration {
     name                          = "internal"
-    subnet_id                     = data.terraform_remote_state.core.outputs.subnets["control"].id
+    subnet_id                     = var.subnet_id
     private_ip_address_allocation = "Dynamic"
     public_ip_address_id          = azurerm_public_ip.vm.id
   }
 
-  tags = local.tags
+  tags = var.tags
 }
 
 resource "azurerm_linux_virtual_machine" "vm" {
   name                            = var.vm_name
-  location                        = var.location
+  location                        = var.tags.region
   resource_group_name             = var.rg_name
   size                            = "Standard_B1ls"
   admin_username                  = "adminuser"
@@ -27,7 +27,7 @@ resource "azurerm_linux_virtual_machine" "vm" {
 
   admin_ssh_key {
     username   = "adminuser"
-    public_key = data.terraform_remote_state.core.outputs.ssh_key.public_key_openssh
+    public_key = var.ssh_public_key
   }
 
   os_disk {
@@ -42,14 +42,14 @@ resource "azurerm_linux_virtual_machine" "vm" {
     version   = "latest"
   }
 
-  tags = local.tags
+  tags = var.tags
 }
 
 resource "azurerm_public_ip" "vm" {
   name                = "jump-box-pip"
-  location            = azurerm_resource_group.aks_jump.location
-  resource_group_name = azurerm_resource_group.aks_jump.name
+  location            = var.tags.region
+  resource_group_name = var.rg_name
   allocation_method   = "Static"
 
-  tags = local.tags
+  tags = var.tags
 }
