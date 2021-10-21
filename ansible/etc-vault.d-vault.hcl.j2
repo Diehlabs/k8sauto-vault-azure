@@ -14,7 +14,7 @@ storage "raft" {
   node_id = "{{ node_id }}"
 
   retry_join {
-    auto_join               = "provider=azure subscription_id={{ ARM_SUBSCRIPTION_ID }} resource_group={{ ARM_RESOURCE_GROUP }} tag_name=consul_auto_join tag_value=clam"
+    auto_join               = "provider=azure subscription_id={{ lookup('env', 'ARM_SUBSCRIPTION_ID' }} tenant_id={{ lookup('env', 'ARM_TENANT_ID' }} client_id={{ lookup('env', 'ARM_CLIENT_ID' }} secret_access_key={{ lookup('env', 'ARM_CLIENT_SECRET' }} tag_name=consul_auto_join tag_value=clam"
     auto_join_scheme        = "https"
     # leader_tls_servername   = "<VALID_TLS_SERVER_NAME>"
     leader_ca_cert_file     = "/opt/vault/tls/vault-ca.pem"

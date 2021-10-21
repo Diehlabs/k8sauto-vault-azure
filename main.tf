@@ -133,7 +133,7 @@ resource "azurerm_storage_account" "vault" {
 }
 
 resource "azurerm_storage_container" "vault" {
-  name                  = "vhds"
+  name                  = "vault"
   storage_account_name  = azurerm_storage_account.vault.name
   container_access_type = "private"
 }
