@@ -1,5 +1,5 @@
-cluster_addr  = "https://{{ node_ip }}:8201"
-api_addr      = "https://{{ node_ip }}:8200"
+cluster_addr  = "https://{{ private_if }}:8201"
+api_addr      = "https://{{ public_if }}:8200"
 disable_mlock = true
 
 listener "tcp" {
@@ -22,18 +22,5 @@ storage "raft" {
     leader_client_key_file  = "/opt/vault/tls/vault-key.pem"
   }
 }
-
-storage "azure" {
-  accountName = "{{ azure_storage_account_name }}"
-  accountKey  = "{{ azure_storage_account_key }}"
-  container   = "{{ azure_storage_container }}"
-  environment = "AzurePublicCloud"
-}
-
-# seal "azurekeyvault" {
-#   tenant_id  = "<AZURE_TENANT_ID>"
-#   vault_name = "<AZURE_VAULT_NAME>"
-#   key_name   = "<AZURE_KEY_NAME>"
-# }
 
 ui = true

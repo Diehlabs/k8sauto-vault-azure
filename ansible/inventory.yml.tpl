@@ -4,7 +4,7 @@ all:
   hosts:
 %{ for host, ipaddr in hosts }
     '${ipaddr}':
-      node_id: ${host}
+      # node_id: ${host}
       # private_ip:
 %{ endfor ~}
   vars:

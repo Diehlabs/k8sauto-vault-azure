@@ -34,3 +34,14 @@
 
   - name: Install Vault
     include_tasks: ../ansible/vault_install.yml
+
+  - name: Distribute vault hcl config file to all nodes
+    ansible.builtin.template:
+      src: ./etc-vault.d-vault.hcl.j2
+      dest: /etc/vault.d/vault.hcl
+
+  - name: Manage the Vault service
+    ansible.builtin.service:
+      name: vault
+      state: started
+      enabled: yes
