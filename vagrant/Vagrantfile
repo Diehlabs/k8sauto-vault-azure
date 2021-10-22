@@ -19,7 +19,7 @@ VMS = {
 # Run Ansible playbook to configure all VMs
 def runansible(node)
   node.vm.provision "ansible" do |ansible|
-    compatibility_mode: "2.0"
+    compatibility_mode = "2.0"
     ansible.limit = "all"
     ansible.playbook = "./vagrant.yml"
     ansible.groups = {
