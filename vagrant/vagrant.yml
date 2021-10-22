@@ -46,6 +46,7 @@
     ansible.builtin.template:
       src: ./etc-vault.d-vault.hcl.j2
       dest: /etc/vault.d/vault.hcl
+    notify: Restart Vault
 
   - name: Manage the Vault service
     ansible.builtin.service:
