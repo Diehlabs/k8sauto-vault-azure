@@ -123,21 +123,22 @@ resource "azurerm_subnet" "vault" {
   service_endpoints    = ["Microsoft.Storage"]
 }
 
-resource "azurerm_storage_account" "vault" {
-  name                     = "vaultcluster1"
-  resource_group_name      = azurerm_resource_group.vault.name
-  location                 = azurerm_resource_group.vault.location
-  account_tier             = "Standard"
-  account_replication_type = "GRS"
+# Storage account doesn't support HA. Also not needed with using integrated storage with Raft!
+# resource "azurerm_storage_account" "vault" {
+#   name                     = "vaultcluster1"
+#   resource_group_name      = azurerm_resource_group.vault.name
+#   location                 = azurerm_resource_group.vault.location
+#   account_tier             = "Standard"
+#   account_replication_type = "GRS"
 
-  tags = local.tags
-}
+#   tags = local.tags
+# }
 
-resource "azurerm_storage_container" "vault" {
-  name                  = "vault"
-  storage_account_name  = azurerm_storage_account.vault.name
-  container_access_type = "private"
-}
+# resource "azurerm_storage_container" "vault" {
+#   name                  = "vault"
+#   storage_account_name  = azurerm_storage_account.vault.name
+#   container_access_type = "private"
+# }
 
 module "vault_vms" {
   source         = "./modules/vm"

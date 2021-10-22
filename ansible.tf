@@ -5,9 +5,9 @@ resource "local_file" "ansible_inventory" {
     hosts = { for host in module.vault_vms :
       host.vm_name => host.public_ip
     }
-    azure_storage_account_name = azurerm_storage_account.vault.name
-    azure_storage_account_key  = sensitive(azurerm_storage_account.vault.primary_access_key)
-    azure_storage_container    = azurerm_storage_container.vault.name
+    # azure_storage_account_name = azurerm_storage_account.vault.name
+    # azure_storage_account_key  = sensitive(azurerm_storage_account.vault.primary_access_key)
+    # azure_storage_container    = azurerm_storage_container.vault.name
   })
 }
 
