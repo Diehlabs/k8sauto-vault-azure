@@ -1,0 +1,10 @@
+---
+# defaults file for private-ca
+
+ca_conf:
+  certs_path:
+    master:
+    clients:
+    er:
+  ovpn_client_certs: []
+  secret_ca_passphrase:
