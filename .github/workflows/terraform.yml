@@ -79,7 +79,7 @@ jobs:
 
     - name: Terraform Apply
       id: apply
-      # if: (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && github.ref == 'refs/heads/main'
+      if: (github.event_name == 'push' && github.ref == 'refs/heads/main') || github.event_name == 'workflow_dispatch'
       run: terraform apply -auto-approve
 
     - name: Ansible
@@ -94,4 +94,4 @@ jobs:
         if [[ -f ./ansible/inventory.yml ]]; then
           ansible-playbook ./ansible/setup.yml -i ./ansible/inventory.yml --private-key ./ansible/rsa.key
         fi
-      # if: (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && github.ref == 'refs/heads/main'
+      if: (github.event_name == 'push' && github.ref == 'refs/heads/main') || github.event_name == 'workflow_dispatch'
