@@ -31,3 +31,6 @@
       state: present
       #key: "{{ lookup('file', '/home/{{ user_id }}/.ssh/id_rsa.pub') }}"
       key: "https://github.com/{{ github_userid }}.keys"
+
+  - name: Install Vault
+    include_tasks: ../ansible/vault_install.yml
