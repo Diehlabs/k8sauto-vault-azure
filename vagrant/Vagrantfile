@@ -20,7 +20,7 @@ VMS = {
 def runansible(node)
   node.vm.provision "ansible" do |ansible|
     ansible.limit = "all"
-    ansible.playbook = "../vagrant.yml"
+    ansible.playbook = "./vagrant.yml"
     #ansible.galaxy_role_file = "ansible/requirements.yml"
     ansible.host_vars = $nodelist
     ansible.groups = {

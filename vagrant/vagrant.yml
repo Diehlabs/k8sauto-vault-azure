@@ -1,0 +1,33 @@
+- hosts: all
+  become: yes
+
+  handlers:
+  - name: restart sshd
+    service: name=sshd state=restarted
+
+  tasks:
+  - name: Allow ssh password auth
+    lineinfile:
+      path: /etc/ssh/sshd_config
+      regex: ^PasswordAuthentication
+      line: PasswordAuthentication yes
+    notify: restart sshd
+
+  - name: Copy vagrant public key from ansible control node (Linux)
+    copy:
+      src: "~/.ssh/id_rsa_{{ user_id }}"
+      dest: "/home/{{ user_id }}/.ssh/id_rsa.pub"
+    when: ansible_system == 'Linux'
+
+  - name: Fix owner of the generated pub key
+    file:
+      path: "/home/{{ user_id }}/.ssh/id_rsa.pub"
+      owner: "{{ user_id }}"
+      group: "{{ user_id }}"
+
+  - name: Add ssh key for vagrant user on all vms
+    authorized_key:
+      user: "{{ user_id }}"
+      state: present
+      #key: "{{ lookup('file', '/home/{{ user_id }}/.ssh/id_rsa.pub') }}"
+      key: "https://github.com/{{ github_userid }}.keys"
