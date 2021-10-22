@@ -19,10 +19,6 @@ VMS = {
 # Build list of unique pod cidrs to add to the ansible vars for each worker node
 $nodelist = {}
 $cidr_base_subnet = IP_START + 1
-VMS[:controllers][:hosts].each_with_index do |hostname, index|
-  $nodelist[hostname] = { "pod_cidr" => K8S_POD_CIDR_BASE + ( $cidr_base_subnet ).to_s + ".0" + K8S_POD_CIDR_MASK }
-  $cidr_base_subnet += 1
-end
 VMS[:nodes][:hosts].each_with_index do |hostname, index|
   $nodelist[hostname] = { "pod_cidr" => K8S_POD_CIDR_BASE + ( $cidr_base_subnet ).to_s + ".0" + K8S_POD_CIDR_MASK }
   $cidr_base_subnet += 1
