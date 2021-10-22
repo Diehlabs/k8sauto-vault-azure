@@ -12,3 +12,4 @@
 inventory.yml
 kubeconf.*
 *.key
+.vagrant
