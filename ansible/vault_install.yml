@@ -1,18 +1,18 @@
 ---
 # curl -fsSL https://apt.releases.hashicorp.com/gpg | sudo apt-key add -
 - name: Add Hashicorp GPG apt Key
-  apt_key:
+  ansible.builtin.apt_key:
     url: https://apt.releases.hashicorp.com/gpg
     state: present
 
 # sudo apt-add-repository "deb [arch=amd64] https://apt.releases.hashicorp.com $(lsb_release -cs) main"
 - name: Add Hashicorp Repository
-  apt_repository:
+  ansible.builtin.apt_repository:
     repo: "deb [arch=amd64] https://apt.releases.hashicorp.com {{ ansible_distribution_release }} main"
     state: present
 
 - name: Update apt and install Vault
-  apt:
+  ansible.builtin.apt:
     update_cache: true
     state: present # manage a version here
     name: vault

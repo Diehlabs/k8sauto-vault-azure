@@ -3,7 +3,14 @@
 
   handlers:
   - name: restart sshd
-    service: name=sshd state=restarted
+    ansible.builtin.service:
+        name: sshd
+        state: restarted
+
+  - name: Restart Vault
+    ansible.builtin.service:
+      name: vault
+      state: restarted
 
   tasks:
   - name: Allow ssh password auth
