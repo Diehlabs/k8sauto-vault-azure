@@ -13,14 +13,14 @@ storage "raft" {
   path    = "/opt/vault/data"
   node_id = "{{ ansible_hostname }}"
 
-  retry_join {
+  {# retry_join {
     auto_join               = "provider=azure subscription_id={{ lookup('env', 'ARM_SUBSCRIPTION_ID' }} tenant_id={{ lookup('env', 'ARM_TENANT_ID' }} client_id={{ lookup('env', 'ARM_CLIENT_ID' }} secret_access_key={{ lookup('env', 'ARM_CLIENT_SECRET' }} tag_name=consul_auto_join tag_value=clam"
     auto_join_scheme        = "https"
     # leader_tls_servername   = "<VALID_TLS_SERVER_NAME>"
     leader_ca_cert_file     = "/opt/vault/tls/vault-ca.pem"
     leader_client_cert_file = "/opt/vault/tls/vault-cert.pem"
     leader_client_key_file  = "/opt/vault/tls/vault-key.pem"
-  }
+  } #}
 }
 
 ui = true
