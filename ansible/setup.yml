@@ -21,7 +21,11 @@
         state: present # manage a version here
         name: vault
 
-    # distribute vault hcl config file to all nodes
+    - name: Distribute vault hcl config file to all nodes
+      ansible.builtin.template:
+        src: ./etc-vault.d-vault.hcl.j2
+        dest: /etc/vault.d/vault.hcl
+
 
     - name: Manage the Vault service
       ansible.builtin.service:
@@ -30,5 +34,3 @@
         enabled: yes
 
     # https://learn.hashicorp.com/tutorials/vault/raft-deployment-guide?in=vault/day-one-raft#prepare-tls-certificates
-
-    # /etc/vault.d/vault.hcl
