@@ -16,15 +16,6 @@ VMS = {
   }
 }
 
-# Build list of unique pod cidrs to add to the ansible vars for each worker node
-$nodelist = {}
-$cidr_base_subnet = IP_START + 1
-VMS[:nodes][:hosts].each_with_index do |hostname, index|
-  $nodelist[hostname] = { "pod_cidr" => K8S_POD_CIDR_BASE + ( $cidr_base_subnet ).to_s + ".0" + K8S_POD_CIDR_MASK }
-  $cidr_base_subnet += 1
-end
-
-
 # Run Ansible playbook to configure all VMs
 def runansible(node)
   node.vm.provision "ansible" do |ansible|
@@ -33,25 +24,12 @@ def runansible(node)
     #ansible.galaxy_role_file = "ansible/requirements.yml"
     ansible.host_vars = $nodelist
     ansible.groups = {
-      "k8s_etcd"       => VMS[:controllers][:hosts], # all controllers will be etcd hosts also
-      "k8s_controller" => VMS[:controllers][:hosts],
-      "k8s_node"     => VMS[:nodes][:hosts],
       "all:vars"       => {
-          "k8s_version" => K8S_VERSION,
-          #"kubectl_download_filetype" => "archive",
-          #"kubectl_checksum_archive" => "sha512:594ca3eadc7974ec4d9e4168453e36ca434812167ef8359086cd64d048df525b7bd46424e7cc9c41e65c72bda3117326ba1662d1c9d739567f10f5684fd85bee",
           "private_if" => VM_INT_IFACE,
           "public_if" => VM_PUB_IFACE,
           "local_id" => VBOX_HOST_USERID,
           "github_userid" => GITHUB_USER_ID,
           "user_id" => VM_USERID,
-          "kube_conf_dir" => "/home/{{ user_id }}/k8s",
-          "k8s_conf_files_dir" => "/home/{{ local_id }}/k8s-conf",
-          "cluster_cidr" => CLUSTER_CIDR,
-          "service_cluster_ip_range" => SERVICE_CLUSTER_IP_RANGE,
-          "cluster_dns" => CLUSTER_DNS,
-          "coredns_forwards" => COREDNS_FORWARDS,
-          "k8s_api_lb_ip" => K8S_API_LB_IP
         }
       }
   end
