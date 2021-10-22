@@ -9,7 +9,6 @@ VM_PUB_IFACE       = "enp0s8"
 MYBOX              = "ubuntu/bionic64" # various issues with focal, going back to bionic
 VM_USERID                = "vagrant"
 VMS = {
-  },
   :nodes => {
     :hosts    => [ "vault01", "vault02", "vault03" ],
     :cpu      => 2,
