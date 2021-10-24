@@ -18,6 +18,7 @@ resource "azurerm_linux_virtual_machine" "vm" {
   location                        = var.tags.region
   resource_group_name             = var.rg_name
   size                            = "Standard_B1ls"
+  availability_set_id             = var.availability_set_id
   admin_username                  = "adminuser"
   disable_password_authentication = true
 
@@ -27,7 +28,7 @@ resource "azurerm_linux_virtual_machine" "vm" {
 
   admin_ssh_key {
     username   = "adminuser"
-    public_key = var.ssh_public_key
+    public_key = var.ssh_key.public_key_openssh
   }
 
   os_disk {
@@ -40,6 +41,11 @@ resource "azurerm_linux_virtual_machine" "vm" {
     offer     = "UbuntuServer"
     sku       = "18.04-LTS"
     version   = "latest"
+  }
+
+  identity {
+    type         = "UserAssigned"
+    identity_ids = [var.msi.id]
   }
 
   tags = var.tags

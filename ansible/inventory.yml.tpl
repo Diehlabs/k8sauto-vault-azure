@@ -2,11 +2,9 @@
 # Terraform will generate this file on every run
 all:
   hosts:
-    localhost:
-  children:
-    vault_nodes:
-%{ for host, ipaddr in hosts }
-      '${ipaddr}':
+%{ for public_ip, private_ip in hosts }
+    '${public_ip}':
+      node_ip: '${private_ip}'
 %{ endfor ~}
   vars:
     ansible_become: yes

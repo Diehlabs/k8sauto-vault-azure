@@ -3,7 +3,7 @@ resource "local_file" "ansible_inventory" {
   content = templatefile("${path.module}/ansible/inventory.yml.tpl", {
     user_id = "adminuser"
     hosts = { for host in module.vault_vms :
-      host.vm_name => host.public_ip
+      host.public_ip => host.ip_address
     }
     # azure_storage_account_name = azurerm_storage_account.vault.name
     # azure_storage_account_key  = sensitive(azurerm_storage_account.vault.primary_access_key)

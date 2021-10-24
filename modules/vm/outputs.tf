@@ -13,3 +13,17 @@ output "vm_name" {
 output "nic_id" {
   value = azurerm_network_interface.vm.id
 }
+
+output "tls_cert_key" {
+  value     = tls_private_key.vm
+  sensitive = true
+}
+
+output "tls_cert" {
+  value     = tls_locally_signed_cert.vm
+  sensitive = true
+}
+
+output "msi" {
+  value = azurerm_linux_virtual_machine.vm.identity
+}

@@ -1,12 +1,13 @@
 cluster_addr  = "https://{{ node_ip }}:8201"
 api_addr      = "https://{{ node_ip }}:8200"
 disable_mlock = true
+ui = true
 
 listener "tcp" {
   address            = "0.0.0.0:8200"
-  tls_cert_file      = "/opt/vault/tls/vault-cert.pem"
-  tls_key_file       = "/opt/vault/tls/vault-key.pem"
-  tls_client_ca_file = "/opt/vault/tls/vault-ca.pem"
+  tls_cert_file      = "/etc/vault/tls/vault-cert.pem"
+  tls_key_file       = "/etc/vault/tls/vault-key.pem"
+  tls_client_ca_file = "/etc/vault/tls/vault-ca.pem"
 }
 
 storage "raft" {
@@ -14,26 +15,19 @@ storage "raft" {
   node_id = "{{ ansible_hostname }}"
 
   retry_join {
-    auto_join               = "provider=azure subscription_id={{ lookup('env', 'ARM_SUBSCRIPTION_ID' }} tenant_id={{ lookup('env', 'ARM_TENANT_ID' }} client_id={{ lookup('env', 'ARM_CLIENT_ID' }} secret_access_key={{ lookup('env', 'ARM_CLIENT_SECRET' }} tag_name=consul_auto_join tag_value=clam"
+    auto_join               = "provider=azure subscription_id={{ lookup('env', 'ARM_SUBSCRIPTION_ID') }} tenant_id={{ lookup('env', 'ARM_TENANT_ID') }} client_id={{ lookup('env', 'ARM_CLIENT_ID') }} secret_access_key={{ lookup('env', 'ARM_CLIENT_SECRET') }} tag_name=consul_auto_join tag_value=clam"
+    {# For MSI use, MSI must have rights to manage role assignments #}
+    {# auto_join               = "provider=azure subscription_id=e5c064d7-9c8f-4e8d-ba57-5da9f1610cb3 tag_name=consul_auto_join tag_value=clam" #}
     auto_join_scheme        = "https"
-    # leader_tls_servername   = "<VALID_TLS_SERVER_NAME>"
-    leader_ca_cert_file     = "/opt/vault/tls/vault-ca.pem"
-    leader_client_cert_file = "/opt/vault/tls/vault-cert.pem"
-    leader_client_key_file  = "/opt/vault/tls/vault-key.pem"
+    leader_tls_servername   = "{{ node_ip }}"
+    leader_ca_cert_file     = "/etc/vault/tls/vault-ca.pem"
+    leader_client_cert_file = "/etc/vault/tls/vault-cert.pem"
+    leader_client_key_file  = "/etc/vault/tls/vault-key.pem"
   }
 }
 
-storage "azure" {
-  accountName = "{{ azure_storage_account_name }}"
-  accountKey  = "{{ azure_storage_account_key }}"
-  container   = "{{ azure_storage_container }}"
-  environment = "AzurePublicCloud"
+seal "azurekeyvault" {
+  tenant_id      = "ea7c73d0-fb18-4161-8331-8341717ba99c"
+  vault_name     = "k8sauto-keyvault"
+  key_name       = "hashivault"
 }
-
-# seal "azurekeyvault" {
-#   tenant_id  = "<AZURE_TENANT_ID>"
-#   vault_name = "<AZURE_VAULT_NAME>"
-#   key_name   = "<AZURE_KEY_NAME>"
-# }
-
-ui = true
