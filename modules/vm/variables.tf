@@ -13,27 +13,27 @@ variable "ssh_key" {
   })
 }
 
-variable "common_name" {}
+# variable "common_name" {}
 
-variable "organization_name" {}
+# variable "organization_name" {}
 
-variable "ca_cert" {
-  type = object({
-    cert_pem = string
-  })
-}
+# variable "ca_cert" {
+#   type = object({
+#     cert_pem = string
+#   })
+# }
 
-variable "ca_key" {
-  type = object({
-    algorithm       = string,
-    private_key_pem = string,
-  })
-}
+# variable "ca_key" {
+#   type = object({
+#     algorithm       = string,
+#     private_key_pem = string,
+#   })
+# }
 
-variable "lb_addresses" {
-  type    = list(any)
-  default = null
-}
+# variable "lb_addresses" {
+#   type    = list(any)
+#   default = null
+# }
 
 variable "msi" {}
 

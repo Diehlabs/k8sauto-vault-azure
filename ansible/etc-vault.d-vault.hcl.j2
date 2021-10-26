@@ -5,9 +5,10 @@ ui = true
 
 listener "tcp" {
   address            = "0.0.0.0:8200"
-  tls_cert_file      = "/etc/vault/tls/vault-cert.pem"
-  tls_key_file       = "/etc/vault/tls/vault-key.pem"
-  tls_client_ca_file = "/etc/vault/tls/vault-ca.pem"
+  tls_cert_file      = "/opt/vault/tls/vault-cert.pem"
+  tls_key_file       = "/opt/vault/tls/vault-key.pem"
+  tls_client_ca_file = "/opt/vault/tls/vault-ca.pem"
+  tls_min_version    = "tls12"
 }
 
 storage "raft" {
@@ -20,9 +21,9 @@ storage "raft" {
     {# auto_join               = "provider=azure subscription_id=e5c064d7-9c8f-4e8d-ba57-5da9f1610cb3 tag_name=consul_auto_join tag_value=clam" #}
     auto_join_scheme        = "https"
     leader_tls_servername   = "{{ node_ip }}"
-    leader_ca_cert_file     = "/etc/vault/tls/vault-ca.pem"
-    leader_client_cert_file = "/etc/vault/tls/vault-cert.pem"
-    leader_client_key_file  = "/etc/vault/tls/vault-key.pem"
+    leader_ca_cert_file     = "/opt/vault/tls/vault-ca.pem"
+    leader_client_cert_file = "/opt/vault/tls/vault-cert.pem"
+    leader_client_key_file  = "/opt/vault/tls/vault-key.pem"
   }
 }
 

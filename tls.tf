@@ -1,21 +1,23 @@
-resource "tls_private_key" "ca" {
-  algorithm = "RSA"
-  rsa_bits  = "2048"
-}
+# module "tls" {
+#   source = "./modules/tls"
+#   hosts_data = {
+#     for vm in module.vault_vms :
+#     (vm.vm_name) => {
+#       dns_names    = tolist([vm.computer_name, vm.vm_name])
+#       ip_addresses = concat(
+#           vm.ip_addresses,
+#           [azurerm_public_ip.vault_lb.ip_address]
+#       )
+#     }
+#   }
+# }
 
-resource "tls_self_signed_cert" "ca" {
-  key_algorithm         = tls_private_key.ca.algorithm
-  private_key_pem       = tls_private_key.ca.private_key_pem
-  is_ca_certificate     = true
-  validity_period_hours = 2400
-  allowed_uses = [
-    "cert_signing",
-    "key_encipherment",
-    "digital_signature",
+module "tls" {
+  source = "./modules/tls"
+  dns_names = [
+    for k, v in local.vms : k
   ]
-
-  subject {
-    common_name  = "diehlabs.com"
-    organization = "Diehlabs, Inc"
-  }
+  ip_addresses = [
+    for name in local.vms : module.vault_vms[name].ip_addresses
+  ]
 }

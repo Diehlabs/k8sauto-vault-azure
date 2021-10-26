@@ -1,6 +1,13 @@
 ---
+# https://learn.hashicorp.com/tutorials/vault/raft-deployment-guide?in=vault/day-one-raft#prepare-tls-certificates
 - hosts:
     all
+
+  handlers:
+    - name: Restart the Vault service
+      ansible.builtin.service:
+        name: vault
+        state: restarted
 
   tasks:
     - name: Install Vault
@@ -11,10 +18,30 @@
         src: ./etc-vault.d-vault.hcl.j2
         dest: /etc/vault.d/vault.hcl
 
+    - name: Distribute tls certs and keys
+      ansible.builtin.copy:
+        dest: "/opt/vault/tls/vault-{{ item }}.pem"
+        content: "{{ hostvars[inventory_hostname][item] | b64decode }}"
+        owner: vault
+        group: vault
+        mode: 'u=rw'
+      loop:
+        # - cert
+        - key
+        - ca
+      notify: Restart the Vault service
+
+    - name: Distribute tls concat cert
+      ansible.builtin.copy:
+        dest: "/opt/vault/tls/vault-cert.pem"
+        content: "{{ hostvars[inventory_hostname]['cert'] | b64decode }}{{ hostvars[inventory_hostname]['ca'] | b64decode }}"
+        owner: vault
+        group: vault
+        mode: 'u=rw'
+      notify: Restart the Vault service
+
     - name: Manage the Vault service
       ansible.builtin.service:
         name: vault
         state: started
         enabled: yes
-
-    # https://learn.hashicorp.com/tutorials/vault/raft-deployment-guide?in=vault/day-one-raft#prepare-tls-certificates

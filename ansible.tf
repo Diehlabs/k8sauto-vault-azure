@@ -3,11 +3,13 @@ resource "local_file" "ansible_inventory" {
   content = templatefile("${path.module}/ansible/inventory.yml.tpl", {
     user_id = "adminuser"
     hosts = { for host in module.vault_vms :
-      host.public_ip => host.ip_address
+      host.public_ip => {
+        private_ip = host.ip_addresses #[0]
+      }
     }
-    # azure_storage_account_name = azurerm_storage_account.vault.name
-    # azure_storage_account_key  = sensitive(azurerm_storage_account.vault.primary_access_key)
-    # azure_storage_container    = azurerm_storage_container.vault.name
+    tls_cert = base64encode(module.tls.cert)
+    tls_key  = sensitive(base64encode(module.tls.key))
+    ca_pem   = base64encode(module.tls.ca_pem)
   })
 }
 
