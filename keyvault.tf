@@ -1,4 +1,7 @@
 resource "azurerm_key_vault" "vault" {
+  depends_on = [
+    azurerm_user_assigned_identity.vault
+  ]
   name                = "k8sauto-keyvault"
   location            = azurerm_resource_group.vault.location
   resource_group_name = azurerm_resource_group.vault.name

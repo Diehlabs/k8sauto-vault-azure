@@ -23,6 +23,7 @@ resource "null_resource" "ansible" {
   depends_on = [
     local_file.ansible_inventory,
     local_file.rsa_key,
+    azurerm_network_interface_security_group_association.vm_ssh,
   ]
   provisioner "local-exec" {
     command = "ansible-playbook ${path.module}/ansible/setup.yml -i ${path.module}/ansible/inventory.yml --private-key ${path.module}/ansible/rsa.key"
