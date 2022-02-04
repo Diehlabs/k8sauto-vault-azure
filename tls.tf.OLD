@@ -20,4 +20,8 @@ module "tls" {
   ip_addresses = [
     for name in local.vms : module.vault_vms[name].ip_addresses
   ]
+  # ip_addresses = concat([
+  #   for name in local.vms : module.vault_vms[name].ip_addresses
+  # ],
+  # azurerm_public_ip.vault_agw.ip_address)
 }

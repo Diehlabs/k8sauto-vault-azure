@@ -1,77 +1,71 @@
-resource "azurerm_key_vault" "vault" {
-  depends_on = [
-    azurerm_user_assigned_identity.vault
-  ]
-  name                = "k8sauto-keyvault"
-  location            = azurerm_resource_group.vault.location
-  resource_group_name = azurerm_resource_group.vault.name
-  tenant_id           = data.azurerm_client_config.current.tenant_id
-
-  # enable virtual machines to access this key vault.
-  enabled_for_deployment = true
-
-  sku_name = "standard"
-
-  tags = local.tags
-
-  # access policy for the vm MSIs
-  #   dynamic "access_policy" {
-  #     for_each = { for vm in module.vault_vms :
-  #       vm.msi[0].principal_id => vm.msi[0].tenant_id
-  #     }
-  #     content {
-  #       tenant_id = access_policy.value
-  #       object_id = access_policy.key
-
-  #       key_permissions = [
-  #         "get",
-  #         "wrapKey",
-  #         "unwrapKey",
-  #       ]
-  #     }
-  #   }
-  access_policy {
-    tenant_id = azurerm_user_assigned_identity.vault.tenant_id
-    object_id = azurerm_user_assigned_identity.vault.principal_id
-
-    key_permissions = [
-      "get",
-      "wrapKey",
-      "unwrapKey",
-    ]
-  }
-
-  # access policy for the user that is currently running terraform.
-  access_policy {
-    tenant_id = data.azurerm_client_config.current.tenant_id
-    object_id = data.azurerm_client_config.current.object_id
-
-    key_permissions = [
-      "get",
-      "list",
-      "create",
-      "delete",
-      "update",
-      "purge",
-    ]
-  }
-
-  # TODO does this really need to be so broad? can it be limited to the vault vm?
-  network_acls {
-    default_action = "Allow"
-    bypass         = "AzureServices"
-  }
+data "azurerm_key_vault" "vault" {
+  name                = "diehlabs-keyvault"
+  resource_group_name = "diehlabs-root"
 }
 
-# hashicorp vault will use this azurerm_key_vault_key to wrap/encrypt its master key.
-resource "azurerm_key_vault_key" "generated" {
-  name         = "hashivault"
-  key_vault_id = azurerm_key_vault.vault.id
-  key_type     = "RSA"
-  key_size     = 2048
-
-  key_opts = [
-    "wrapKey",
-    "unwrapKey",
+locals {
+  dns_names = [
+    for k, v in local.vms : k
   ]
+  ip_addresses = [
+    for name in local.vms : module.vault_vms[name].ip_addresses
+  ]
+}
+
+resource "azurerm_key_vault_certificate" "vault" {
+  name         = "vault-cluster"
+  key_vault_id = azurerm_key_vault.vault.id
+
+  certificate_policy {
+    issuer_parameters {
+      name = "Self"
+    }
+
+    key_properties {
+      exportable = true
+      key_size   = 2048
+      key_type   = "RSA"
+      reuse_key  = true
+    }
+
+    lifetime_action {
+      action {
+        action_type = "AutoRenew"
+      }
+
+      trigger {
+        days_before_expiry = 30
+      }
+    }
+
+    secret_properties {
+      content_type = "application/x-pem-file"
+    }
+
+    x509_certificate_properties {
+      #   Server Authentication = 1.3.6.1.5.5.7.3.1
+      #   Client Authentication = 1.3.6.1.5.5.7.3.2
+      extended_key_usage = ["1.3.6.1.5.5.7.3.1", "1.3.6.1.5.5.7.3.2"]
+
+      key_usage = [
+        "cRLSign",
+        "dataEncipherment",
+        "digitalSignature",
+        "keyAgreement",
+        "keyCertSign",
+        "keyEncipherment",
+      ]
+
+      subject_alternative_names {
+        dns_names = concat(
+          ["127.0.0.1"],
+          local.dns_names,
+          local.ip_addresses
+        )
+      }
+
+      subject            = "CN=hcv"
+      validity_in_months = 12
+    }
+  }
 }

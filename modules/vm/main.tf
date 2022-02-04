@@ -1,6 +1,6 @@
 resource "azurerm_network_interface" "vm" {
   name                = "${var.vm_name}-nic"
-  location            = var.tags.region
+  location            = var.tags.location
   resource_group_name = var.rg_name
   ip_configuration {
     name                          = "default"
@@ -12,11 +12,9 @@ resource "azurerm_network_interface" "vm" {
 }
 
 resource "azurerm_linux_virtual_machine" "vm" {
-  #############################################################
-  # availability_set_id             = var.availability_set_id #
-  #############################################################
+  availability_set_id             = var.availability_set_id
   name                            = var.vm_name
-  location                        = var.tags.region
+  location                        = var.tags.location
   resource_group_name             = var.rg_name
   size                            = "Standard_B1ls"
   admin_username                  = "adminuser"
@@ -53,7 +51,7 @@ resource "azurerm_linux_virtual_machine" "vm" {
 
 resource "azurerm_public_ip" "vm_pub_ip" {
   name                = "${var.vm_name}-pubip"
-  location            = var.tags.region
+  location            = var.tags.location
   resource_group_name = var.rg_name
   allocation_method   = "Static"
   sku                 = "Standard"

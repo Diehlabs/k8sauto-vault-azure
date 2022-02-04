@@ -5,17 +5,22 @@ resource "azurerm_virtual_network" "vault" {
   resource_group_name = azurerm_resource_group.vault.name
 }
 
+# https://www.calculator.net/ip-subnet-calculator.html?cclass=c&csubnet=28&cip=192.168.50.0&ctype=ipv4&printit=0&x=67&y=20
+
 resource "azurerm_subnet" "vault" {
   name                 = "vault-cluster"
   resource_group_name  = azurerm_resource_group.vault.name
   virtual_network_name = azurerm_virtual_network.vault.name
-  address_prefixes     = ["192.168.50.0/24"]
-  service_endpoints    = ["Microsoft.Storage"]
+  address_prefixes     = ["192.168.50.0/28"]
+  service_endpoints = [
+    "Microsoft.Storage",
+    "Microsoft.KeyVault"
+  ]
 }
 
 resource "azurerm_network_security_group" "vault_vm_nsg" {
-  name                = "vault-nsg"
-  location            = local.tags.region
+  name                = "vault-vm-nsg"
+  location            = local.tags.location
   resource_group_name = azurerm_resource_group.vault.name
 
   security_rule {
@@ -62,4 +67,40 @@ resource "azurerm_network_interface_security_group_association" "vm_ssh" {
   }
   network_interface_id      = each.value
   network_security_group_id = azurerm_network_security_group.vault_vm_nsg.id
+}
+
+resource "azurerm_network_security_group" "vault_subnet_nsg" {
+  name                = "vault-subnet-nsg"
+  location            = local.tags.location
+  resource_group_name = azurerm_resource_group.vault.name
+
+  security_rule {
+    name                       = "SSH"
+    priority                   = 1001
+    direction                  = "Inbound"
+    access                     = "Allow"
+    protocol                   = "Tcp"
+    source_port_range          = "*"
+    destination_port_range     = "22"
+    source_address_prefix      = "*"
+    destination_address_prefix = "*"
+  }
+
+  security_rule {
+    name                       = "VAULT"
+    priority                   = 1100
+    direction                  = "Inbound"
+    access                     = "Allow"
+    protocol                   = "Tcp"
+    source_port_range          = "*"
+    destination_port_range     = "8200"
+    source_address_prefix      = "*"
+    destination_address_prefix = "*"
+  }
+
+}
+
+resource "azurerm_subnet_network_security_group_association" "vault_subnet_nsg" {
+  subnet_id                 = azurerm_subnet.vault.id
+  network_security_group_id = azurerm_network_security_group.vault_subnet_nsg.id
 }

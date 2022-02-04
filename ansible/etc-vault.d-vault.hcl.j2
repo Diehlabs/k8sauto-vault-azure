@@ -28,7 +28,7 @@ storage "raft" {
 }
 
 seal "azurekeyvault" {
-  tenant_id      = "ea7c73d0-fb18-4161-8331-8341717ba99c"
+  tenant_id      = "{{ lookup('env', 'ARM_TENANT_ID') }}"
   vault_name     = "k8sauto-keyvault"
   key_name       = "hashivault"
 }
